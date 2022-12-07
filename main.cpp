@@ -35,6 +35,10 @@ int main()
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::W) && velocityDist >= 41)
             car.move(carSpeed*step);
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && velocityDist >= 41)
+            carSpeed = 20;
+        else
+            carSpeed = 10;
 
         car.setRotation(carAngle);
 
