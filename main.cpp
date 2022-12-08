@@ -9,22 +9,61 @@ class Bullet
 {
 public:
     sf::Texture bulletTexture;
-    sf::Sprite bullet;
+    sf::Sprite bulletBody;
 
     sf::Vector2f velocity;
     float speed = 10.f;
 
-    Bullet()
+    Bullet(sf::Vector2f velocity, sf::Vector2f position)
     {
         this->bulletTexture.loadFromFile("spr_orange.png");
-        this->bullet.setTexture(this->bulletTexture);
-        this->bullet.setOrigin(8.f, 8.f);
+        this->bulletBody.setTexture(this->bulletTexture);
+        this->bulletBody.setOrigin(8.f, 8.f);
+        this->velocity = velocity;
+        this->bulletBody.setPosition(position);
     }
 };
 
 class Enemy
 {
+public:
+    sf::Texture enemyTexture;
+    sf::Sprite enemyBody;
 
+    float speed = 2.f;
+
+    sf::Vector2f velocity(sf::Vector2f playerPos)
+    {
+        sf::Vector2f vel = playerPos - sf::Vector2f(this->enemyBody.getPosition().x, this->enemyBody.getPosition().y);
+        float dif = std::sqrt(std::pow(vel.x, 2) + std::pow(vel.y, 2));
+        return vel/dif;
+    }
+
+    Enemy()
+    {
+        int randomnumber = rand()%3;
+        switch(randomnumber)
+        {
+        case 0:
+            {
+                this->enemyTexture.loadFromFile("spr_ghost_hard.png");
+                break;
+            }
+        case 1:
+            {
+                this->enemyTexture.loadFromFile("spr_ghost.png");
+                break;
+            }
+        case 2:
+            {
+                this->enemyTexture.loadFromFile("spr_blob.png");
+                break;
+            }
+        }
+        this->enemyBody.setTexture(enemyTexture);
+        this->enemyBody.setTextureRect(sf::IntRect(0, 0, 16, 16));
+        this->enemyBody.setPosition(rand()%1280, rand()%720);
+    }
 };
 
 
@@ -56,13 +95,13 @@ int main()
     float playerSpeed = 5.f;
     float fireRate = 100;
 
-    sf::Clock clock;
+    sf::Clock shootClock;
+    sf::Clock enemySpawnClock;
 
-    Bullet originBullet;
-    std::vector<Bullet> bullets;
+    std::vector<Enemy*> enemies;
+    float enemySpawnRate = 1;
 
-    Bullet b1;
-
+    std::vector<Bullet*> bullets;
 
     sf::Event event;
     while(okno.isOpen())
@@ -97,17 +136,26 @@ int main()
         else
             fireRate = 200;
 
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && clock.getElapsedTime().asMilliseconds() > fireRate)
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && shootClock.getElapsedTime().asMilliseconds() > fireRate)
         {
-            b1.bullet.setPosition(playerPos);
-            b1.velocity = velocity/velocityLength;
-            bullets.push_back(Bullet(b1));
-            clock.restart();
+            bullets.push_back(new Bullet(velocity/velocityLength, playerPos));
+            shootClock.restart();
+        }
+
+        if(enemySpawnClock.getElapsedTime().asSeconds() > 1)
+        {
+            enemies.push_back(new Enemy);
+            enemySpawnClock.restart();
         }
 
         for(int i = 0; i < bullets.size(); i++)
         {
-            bullets[i].bullet.move(bullets[i].velocity * bullets[i].speed);
+            bullets[i]->bulletBody.move(bullets[i]->velocity * bullets[i]->speed);
+        }
+
+        for(int i = 0; i < enemies.size(); i++)
+        {
+            enemies[i]->enemyBody.move(enemies[i]->velocity(playerPos) * enemies[i]->speed);
         }
 
 
@@ -115,7 +163,12 @@ int main()
 
         for(int i = 0; i < bullets.size(); i++)
         {
-            okno.draw(bullets[i].bullet);
+            okno.draw(bullets[i]->bulletBody);
+        }
+
+        for(int i = 0; i < enemies.size(); i++)
+        {
+            okno.draw(enemies[i]->enemyBody);
         }
 
         okno.draw(player);
