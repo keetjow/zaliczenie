@@ -62,7 +62,9 @@ public:
         }
         this->enemyBody.setTexture(enemyTexture);
         this->enemyBody.setTextureRect(sf::IntRect(0, 0, 16, 16));
+        this->enemyBody.setOrigin(this->enemyBody.getPosition().x + 8,this->enemyBody.getPosition().y + 8);
         this->enemyBody.setPosition(rand()%1280, rand()%720);
+        this->enemyBody.setScale(2.f, 2.f);
     }
 };
 
