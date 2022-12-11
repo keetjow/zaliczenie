@@ -23,23 +23,23 @@ Player::Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vect
     this->body.setPosition(this->window.getSize().x/2, this->window.getSize().y/2);
     this->body.setScale(2, 2);
     //Stats setup
-    this->movementSpeed = 4.f;
+    this->movementSpeed = 400.f;
     this->hp = 50.f;
     this->attackPower = 10.f;
 }
 
 //Player methods
-void Player::update()
+void Player::update(float &dt)
 {
     //Movement
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-        this->body.move(0.f, -1.f*this->movementSpeed);
+        this->body.move(0.f, -1.f*this->movementSpeed*dt);
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        this->body.move(0.f, 1.f*this->movementSpeed);
+        this->body.move(0.f, 1.f*this->movementSpeed*dt);
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        this->body.move(-1.f*this->movementSpeed, 0.f);
+        this->body.move(-1.f*this->movementSpeed*dt, 0.f);
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        this->body.move(1.f*this->movementSpeed, 0.f);
+        this->body.move(1.f*this->movementSpeed*dt, 0.f);
 
     //Looking at mouse direction
     float angle = std::atan2(this->mousePos.x - this->body.getPosition().x, this->mousePos.y - this->body.getPosition().y) * 180/M_PI;
@@ -75,7 +75,7 @@ BlueGhost::BlueGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2
     this->body.setScale(2, 2);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 3.f;
+    this->movementSpeed = 300.f;
     this->hp = 10.f;
     this->attackPower = 10.f;
 }
@@ -90,7 +90,7 @@ PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vec
     this->body.setScale(2, 2);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 2.f;
+    this->movementSpeed = 200.f;
     this->hp = 20.f;
     this->attackPower = 15.f;
 }
@@ -105,18 +105,18 @@ Slime::Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startP
     this->body.setScale(2, 2);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 1.5f;
+    this->movementSpeed = 150.f;
     this->hp = 50.f;
     this->attackPower = 30.f;
 }
 
 //Enemy update
-void Enemy::update()
+void Enemy::update(float &dt)
 {
     this->velocity = this->target->body.getPosition() - this->body.getPosition();
     float dist = std::sqrt(std::pow(velocity.x, 2) + std::pow(velocity.y, 2));
     sf::Vector2f velocityN = this->velocity/dist;
-    this->body.move(velocityN * this->movementSpeed);
+    this->body.move(velocityN * this->movementSpeed*dt);
 }
 
 
@@ -135,9 +135,9 @@ Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::V
 }
 
 //Projectile methods
-void Projectile::update()
+void Projectile::update(float &dt)
 {
-    this->body.move(this->velocityN * this->speed);
+    this->body.move(this->velocityN * this->speed*dt);
 }
 
 void Projectile::draw()
