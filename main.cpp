@@ -52,17 +52,17 @@ int main()
             {
                 case 0:
                 {
-                    enemies.push_back(new BlueGhost(gameWindow, player->body.getPosition(), randomPosition));
+                    enemies.push_back(new BlueGhost(gameWindow, player, randomPosition));
                     break;
                 }
                 case 1:
                 {
-                    enemies.push_back(new PurpleGhost(gameWindow, player->body.getPosition(), randomPosition));
+                    enemies.push_back(new PurpleGhost(gameWindow, player, randomPosition));
                     break;
                 }
                 case 2:
                 {
-                    enemies.push_back(new Slime(gameWindow, player->body.getPosition(), randomPosition));
+                    enemies.push_back(new Slime(gameWindow, player, randomPosition));
                     break;
                 }
             }
