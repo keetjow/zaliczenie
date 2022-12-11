@@ -2,6 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "classes.h"
+#include <cstdlib>
+#include <time.h>
 
 int main()
 {
@@ -15,9 +17,15 @@ int main()
     //Projectiles setup
     std::vector<Projectile*> projectiles;
 
+    //Enemies setup
+    std::vector<Enemy*> enemies;
+    sf::Clock enemySpawnRate;
+    srand(time(NULL));
+    float spawnRate = 1;
+
     //Player setup
     sf::Vector2f mousePos;
-    Player player(gameWindow, mousePos, projectiles);
+    Entity* player = new Player(gameWindow, mousePos, projectiles);
 
     //Main loop
     while(gameWindow.isOpen())
@@ -34,18 +42,49 @@ int main()
         mousePos = sf::Vector2f(sf::Mouse::getPosition(gameWindow));
 
         //Game logic
-        player.update();
+        player->update();
+        //Spawning enemies
+        if(enemySpawnRate.getElapsedTime().asSeconds() > spawnRate)
+        {
+            sf::Vector2f randomPosition(rand()%1281, rand()%721);
+            int randomNumber = rand()%3;
+            switch(randomNumber)
+            {
+                case 0:
+                {
+                    enemies.push_back(new BlueGhost(gameWindow, player->body.getPosition(), randomPosition));
+                    break;
+                }
+                case 1:
+                {
+                    enemies.push_back(new PurpleGhost(gameWindow, player->body.getPosition(), randomPosition));
+                    break;
+                }
+                case 2:
+                {
+                    enemies.push_back(new Slime(gameWindow, player->body.getPosition(), randomPosition));
+                    break;
+                }
+            }
+            enemySpawnRate.restart();
+        }
 
         for(int i = 0; i < projectiles.size(); i++)
             projectiles[i]->update();
 
+        for(int i = 0; i < enemies.size(); i++)
+            enemies[i]->update();
+
         //Drawing sprites
         gameWindow.clear();
 
-        player.draw();
+        player->draw();
 
         for(int i = 0; i < projectiles.size(); i++)
             projectiles[i]->draw();
+
+        for(int i = 0; i < enemies.size(); i++)
+            enemies[i]->draw();
 
         //Final frame display
         gameWindow.display();
