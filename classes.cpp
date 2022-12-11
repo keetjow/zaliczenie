@@ -13,7 +13,7 @@ void Entity::draw()
 
 //Player constructor
 Player::Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vector<Projectile*> &projectilesRef)
- : Entity(windowRef), mousePos(mousePosRef), projectiles(projectilesRef)
+ :Entity(windowRef), mousePos(mousePosRef), projectiles(projectilesRef)
 {
     //Body setup
     this->texture.loadFromFile("media/spr_character.png");
@@ -62,9 +62,10 @@ void Player::shoot()
 
 
 //Enemies constructors
-Enemy::Enemy(sf::RenderWindow &windowRef, sf::Vector2f &targetPosRef): Entity(windowRef), targetPos(targetPosRef){}
+Enemy::Enemy(sf::RenderWindow &windowRef, Entity* targetRef)
+    :Entity(windowRef), target(targetRef){}
 
-BlueGhost::BlueGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
+BlueGhost::BlueGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos) : Enemy(windowRef, targetRef)
 {
     //Body setup
     this->texture.loadFromFile("media/spr_ghost.png");
@@ -79,7 +80,7 @@ BlueGhost::BlueGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf:
     this->attackPower = 10.f;
 }
 
-PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
+PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos) : Enemy(windowRef, targetRef)
 {
     //Body setup
     this->texture.loadFromFile("media/spr_ghost_hard.png");
@@ -94,7 +95,7 @@ PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef,
     this->attackPower = 15.f;
 }
 
-Slime::Slime(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
+Slime::Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos) : Enemy(windowRef, targetRef)
 {
     //Body setup
     this->texture.loadFromFile("media/spr_blob.png");
@@ -112,7 +113,7 @@ Slime::Slime(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2
 //Enemy update
 void Enemy::update()
 {
-    this->velocity = this->targetPos - this->body.getPosition();
+    this->velocity = this->target->body.getPosition() - this->body.getPosition();
     float dist = std::sqrt(std::pow(velocity.x, 2) + std::pow(velocity.y, 2));
     sf::Vector2f velocityN = this->velocity/dist;
     this->body.move(velocityN * this->movementSpeed);
