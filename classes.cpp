@@ -3,18 +3,29 @@
 #include "classes.h"
 #include <math.h>
 
+//Entity drawing setup
+Entity::Entity(sf::RenderWindow &windowRefBase): window(windowRefBase){};
+void Entity::draw()
+{
+    this->window.draw(this->body);
+}
+
 
 //Player constructor
 Player::Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vector<Projectile*> &projectilesRef)
-:window(windowRef), mousePos(mousePosRef), projectiles(projectilesRef)
+ : Entity(windowRef), mousePos(mousePosRef), projectiles(projectilesRef)
 {
-
+    //Body setup
     this->texture.loadFromFile("media/spr_character.png");
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
-    this->body.setPosition(this->window.getPosition().x, this->window.getPosition().y);
+    this->body.setPosition(this->window.getSize().x/2, this->window.getSize().y/2);
     this->body.setScale(2, 2);
+    //Stats setup
+    this->movementSpeed = 4.f;
+    this->hp = 50.f;
+    this->attackPower = 10.f;
 }
 
 //Player methods
@@ -36,9 +47,7 @@ void Player::update()
 
     //Shooting
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
-    {
         this->shoot();
-    }
 }
 
 void Player::shoot()
@@ -49,13 +58,66 @@ void Player::shoot()
         this->projectiles.push_back(new Projectile(this->window, this->body.getPosition(), velocity));
         this->shootTimer.restart();
     }
-
 }
 
-void Player::draw()
+
+//Enemies constructors
+Enemy::Enemy(sf::RenderWindow &windowRef, sf::Vector2f &targetPosRef): Entity(windowRef), targetPos(targetPosRef){}
+
+BlueGhost::BlueGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
 {
-    this->window.draw(this->body);
+    //Body setup
+    this->texture.loadFromFile("media/spr_ghost.png");
+    this->body.setTexture(this->texture);
+    this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
+    this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
+    this->body.setScale(2, 2);
+    this->body.setPosition(startPos);
+    //Stats setup
+    this->movementSpeed = 3.f;
+    this->hp = 10.f;
+    this->attackPower = 10.f;
 }
+
+PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
+{
+    //Body setup
+    this->texture.loadFromFile("media/spr_ghost_hard.png");
+    this->body.setTexture(this->texture);
+    this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
+    this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
+    this->body.setScale(2, 2);
+    this->body.setPosition(startPos);
+    //Stats setup
+    this->movementSpeed = 2.f;
+    this->hp = 20.f;
+    this->attackPower = 15.f;
+}
+
+Slime::Slime(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos) : Enemy(windowRef, targetPosRef)
+{
+    //Body setup
+    this->texture.loadFromFile("media/spr_blob.png");
+    this->body.setTexture(this->texture);
+    this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
+    this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
+    this->body.setScale(2, 2);
+    this->body.setPosition(startPos);
+    //Stats setup
+    this->movementSpeed = 1.5f;
+    this->hp = 50.f;
+    this->attackPower = 30.f;
+}
+
+//Enemy update
+void Enemy::update()
+{
+    this->velocity = this->targetPos - this->body.getPosition();
+    float dist = std::sqrt(std::pow(velocity.x, 2) + std::pow(velocity.y, 2));
+    sf::Vector2f velocityN = this->velocity/dist;
+    this->body.move(velocityN * this->movementSpeed);
+}
+
 
 //Projectile constructor
 Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::Vector2f velocity)
@@ -71,6 +133,7 @@ Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::V
     this->velocityN = velocity/dist;
 }
 
+//Projectile methods
 void Projectile::update()
 {
     this->body.move(this->velocityN * this->speed);
