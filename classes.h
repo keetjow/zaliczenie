@@ -19,30 +19,56 @@ class Projectile
 class Entity
 {
     protected:
-        float hp = 5.f;
-        float movementSpeed = 10.f;
-        float attackPower = 10.f;
-
+        float hp;
+        float movementSpeed;
+        float attackPower;
+        sf::RenderWindow &window;
         sf::Texture texture;
-        sf::Sprite body;
 
     public:
-        virtual void draw() = 0;
+        sf::Sprite body;
+        void draw();
         virtual void update() = 0;
+        Entity(sf::RenderWindow &windowRefBase);
 };
 
 class Player : public Entity
 {
     public:
         float fireRate = 200;
-        sf::RenderWindow &window;
         sf::Vector2f &mousePos;
         std::vector<Projectile*> &projectiles;
         sf::Clock shootTimer;
-        Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vector<Projectile*> &projectiles);
-        virtual void update();
-        virtual void draw();
+        Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vector<Projectile*> &projectilesRef);
+        void update();
         void shoot();
+};
+
+class Enemy : public Entity
+{
+    public:
+        sf::Vector2f &targetPos;
+        void update();
+        Enemy(sf::RenderWindow &windowRef, sf::Vector2f &targetPosRef);
+        sf::Vector2f velocity;
+};
+
+class BlueGhost : public Enemy
+{
+    public:
+    BlueGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
+};
+
+class PurpleGhost : public Enemy
+{
+    public:
+    PurpleGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
+};
+
+class Slime : public Enemy
+{
+    public:
+    Slime(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
 };
 
 
