@@ -13,6 +13,8 @@ int main()
     sf::RenderWindow gameWindow(sf::VideoMode(1280, 720, 32), "Projekt na zaliczenie", sf::Style::Fullscreen, settings);
     gameWindow.setFramerateLimit(60);
     gameWindow.setVerticalSyncEnabled(true);
+    float dt;
+    sf::Clock dt_clock;
 
     //Projectiles setup
     std::vector<Projectile*> projectiles;
@@ -30,6 +32,7 @@ int main()
     //Main loop
     while(gameWindow.isOpen())
     {
+        dt = dt_clock.restart().asSeconds();
         //Event loop
         sf::Event event;
         while(gameWindow.pollEvent(event))
@@ -42,7 +45,7 @@ int main()
         mousePos = sf::Vector2f(sf::Mouse::getPosition(gameWindow));
 
         //Game logic
-        player->update();
+        player->update(dt);
         //Spawning enemies
         if(enemySpawnRate.getElapsedTime().asSeconds() > spawnRate)
         {
@@ -70,10 +73,26 @@ int main()
         }
 
         for(int i = 0; i < projectiles.size(); i++)
-            projectiles[i]->update();
+        {
+            projectiles[i]->update(dt);
+            if(projectiles[i]->body.getPosition().x > 1280 || projectiles[i]->body.getPosition().x < 0 || projectiles[i]->body.getPosition().y > 720 || projectiles[i]->body.getPosition().y < 0)
+                projectiles.erase(projectiles.begin() + i);
+        }
 
         for(int i = 0; i < enemies.size(); i++)
-            enemies[i]->update();
+        {
+            enemies[i]->update(dt);
+            for(int j = 0; j < projectiles.size(); j++)
+            {
+                if(enemies[i]->body.getGlobalBounds().intersects(projectiles[j]->body.getGlobalBounds()))
+                {
+                    enemies.erase(enemies.begin() + i);
+                    projectiles.erase(projectiles.begin() + j);
+                    break;
+                }
+
+            }
+        }
 
         //Drawing sprites
         gameWindow.clear();
