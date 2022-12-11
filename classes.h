@@ -47,28 +47,28 @@ class Player : public Entity
 class Enemy : public Entity
 {
     public:
-        sf::Vector2f &targetPos;
+        Entity* target;
         void update();
-        Enemy(sf::RenderWindow &windowRef, sf::Vector2f &targetPosRef);
+        Enemy(sf::RenderWindow &windowRef, Entity* targetRef);
         sf::Vector2f velocity;
 };
 
 class BlueGhost : public Enemy
 {
     public:
-    BlueGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
+    BlueGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
 
 class PurpleGhost : public Enemy
 {
     public:
-    PurpleGhost(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
+    PurpleGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
 
 class Slime : public Enemy
 {
     public:
-    Slime(sf::RenderWindow &windowRef, sf::Vector2f targetPosRef, sf::Vector2f startPos);
+    Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
 
 
