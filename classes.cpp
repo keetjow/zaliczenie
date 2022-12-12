@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include "classes.h"
 #include <math.h>
+//#include <iostream>  //memory release debug
 
 //Entity drawing setup
 Entity::Entity(sf::RenderWindow &windowRefBase): window(windowRefBase){};
@@ -144,3 +145,16 @@ void Projectile::draw()
 {
     this->window.draw(this->body);
 }
+
+
+//debug memory release
+/*
+Projectile::~Projectile()
+{
+    std::cout<<"Projectile out"<<std::endl;
+}
+Enemy::~Enemy()
+{
+    std::cout<<"Enemy dead"<<std::endl;
+}
+*/
