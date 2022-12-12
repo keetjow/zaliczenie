@@ -14,6 +14,8 @@ class Projectile
         Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::Vector2f velocity);
         void update(float &dt);
         void draw();
+        //debug
+        //~Projectile();
 };
 
 class Entity
@@ -51,6 +53,8 @@ class Enemy : public Entity
         void update(float &dt);
         Enemy(sf::RenderWindow &windowRef, Entity* targetRef);
         sf::Vector2f velocity;
+        //debug
+        //~Enemy();
 };
 
 class BlueGhost : public Enemy
@@ -70,8 +74,3 @@ class Slime : public Enemy
     public:
     Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
-
-
-
-
-
