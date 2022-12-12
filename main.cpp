@@ -76,7 +76,10 @@ int main()
         {
             projectiles[i]->update(dt);
             if(projectiles[i]->body.getPosition().x > 1280 || projectiles[i]->body.getPosition().x < 0 || projectiles[i]->body.getPosition().y > 720 || projectiles[i]->body.getPosition().y < 0)
+            {
+                delete projectiles[i];
                 projectiles.erase(projectiles.begin() + i);
+            }
         }
 
         for(int i = 0; i < enemies.size(); i++)
@@ -86,7 +89,9 @@ int main()
             {
                 if(enemies[i]->body.getGlobalBounds().intersects(projectiles[j]->body.getGlobalBounds()))
                 {
+                    delete enemies[i];
                     enemies.erase(enemies.begin() + i);
+                    delete projectiles[j];
                     projectiles.erase(projectiles.begin() + j);
                     break;
                 }
