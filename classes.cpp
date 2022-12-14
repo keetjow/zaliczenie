@@ -65,7 +65,7 @@ void Player::shoot()
 
 void Player::useAbility()
 {
-    if(this->abilityCooldown.getElapsedTime().asSeconds() > 5)
+    if(this->abilityCooldown.getElapsedTime().asSeconds() > 4)
     {
         for(int i = 0; i < 16; i++)
         {
