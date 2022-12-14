@@ -22,9 +22,9 @@ Player::Player(sf::RenderWindow &windowRef, sf::Vector2f &mousePosRef, std::vect
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
     this->body.setPosition(this->window.getSize().x/2, this->window.getSize().y/2);
-    this->body.setScale(2, 2);
+    this->body.setScale(3, 3);
     //Stats setup
-    this->movementSpeed = 400.f;
+    this->movementSpeed = 550.f;
     this->hp = 50.f;
     this->attackPower = 10.f;
 }
@@ -92,8 +92,9 @@ BlueGhost::BlueGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2
     this->body.setScale(3, 3);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 230.f;
+    this->movementSpeed = 250.f;
     this->hp = 10.f;
+    this->maxHp = 10.f;
     this->attackPower = 10.f;
 }
 
@@ -107,8 +108,9 @@ PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vec
     this->body.setScale(3, 3);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 200.f;
+    this->movementSpeed = 220.f;
     this->hp = 20.f;
+    this->maxHp = 20.f;
     this->attackPower = 20.f;
 }
 
@@ -119,11 +121,12 @@ Slime::Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startP
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
-    this->body.setScale(3, 3);
+    this->body.setScale(6, 6);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 150.f;
+    this->movementSpeed = 190.f;
     this->hp = 50.f;
+    this->maxHp = 50.f;
     this->attackPower = 30.f;
 }
 
@@ -152,23 +155,25 @@ void Enemy::update(float &dt)
 //Enemy damage managment
 void Enemy::takeDamage(float damageReceiveAmount)
 {
+    if(this->body.getScale().x > 2.5f && this->body.getScale().y > 2.5f)
+        this->body.setScale(this->body.getScale().x - this->body.getScale().x/10, this->body.getScale().y - this->body.getScale().y/10);
+
     this->hp -= damageReceiveAmount;
-    this->body.setScale(this->body.getScale().x -0.3f, this->body.getScale().y -0.3f);
-    this->movementSpeed -= 30;
-    if(this->hp < 0)
+    this->movementSpeed -= 10;
+    if(this->hp <= 0)
         this->alive = false;
 }
 
 //Projectile constructor
 Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::Vector2f velocity, float damageAmount)
-    :window(windowRef)
+    :window(windowRef), damage(damageAmount)
 {
-    this->damage = damageAmount;
     this->texture.loadFromFile("media/projectiles.png");
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(16, 8, 8, 8));
     this->body.setOrigin(this->body.getPosition().x + 4, this->body.getPosition().y + 4);
     this->body.setPosition(startPos);
+    this->body.setScale(2, 2);
     this->velocity = velocity;
     float dist = std::sqrt(std::pow(velocity.x, 2) + std::pow(velocity.y, 2));
     this->velocityN = velocity/dist;
@@ -183,6 +188,14 @@ void Projectile::update(float &dt)
 void Projectile::draw()
 {
     this->window.draw(this->body);
+}
+
+float distanceBetween(sf::Vector2f a, sf::Vector2f b)
+{
+    sf::Vector2f vel = a - b;
+    float distance = std::sqrt(std::pow(vel.x, 2) + std::pow(vel.y, 2));
+    return distance;
+
 }
 
 
