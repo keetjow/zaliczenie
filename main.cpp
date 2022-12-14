@@ -10,7 +10,7 @@ int main()
     //Window setup
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8.f;
-    sf::RenderWindow gameWindow(sf::VideoMode(1280, 720, 32), "Projekt na zaliczenie", sf::Style::Fullscreen, settings);
+    sf::RenderWindow gameWindow(sf::VideoMode(1920, 1080, 32), "Projekt na zaliczenie", sf::Style::Fullscreen, settings);
     gameWindow.setFramerateLimit(60);
     gameWindow.setVerticalSyncEnabled(true);
     float dt;
@@ -49,7 +49,7 @@ int main()
         //Spawning enemies
         if(enemySpawnRate.getElapsedTime().asSeconds() > spawnRate)
         {
-            sf::Vector2f randomPosition(rand()%1281, rand()%721);
+            sf::Vector2f randomPosition(rand()%1921, rand()%1081);
             int randomNumber = rand()%3;
             switch(randomNumber)
             {
@@ -75,7 +75,7 @@ int main()
         for(int i = 0; i < projectiles.size(); i++)
         {
             projectiles[i]->update(dt);
-            if(projectiles[i]->body.getPosition().x > 1280 || projectiles[i]->body.getPosition().x < 0 || projectiles[i]->body.getPosition().y > 720 || projectiles[i]->body.getPosition().y < 0)
+            if(projectiles[i]->body.getPosition().x > 1920 || projectiles[i]->body.getPosition().x < 0 || projectiles[i]->body.getPosition().y > 1080 || projectiles[i]->body.getPosition().y < 0)
             {
                 delete projectiles[i];
                 projectiles.erase(projectiles.begin() + i);
