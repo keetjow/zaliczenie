@@ -23,7 +23,7 @@ int main()
     std::vector<Enemy*> enemies;
     sf::Clock enemySpawnRate;
     srand(time(NULL));
-    float spawnRate = 1;
+    float spawnRate = 3;
 
     //Player setup
     sf::Vector2f mousePos;
@@ -89,15 +89,21 @@ int main()
             {
                 if(enemies[i]->body.getGlobalBounds().intersects(projectiles[j]->body.getGlobalBounds()))
                 {
-                    delete enemies[i];
-                    enemies.erase(enemies.begin() + i);
+                    enemies[i]->takeDamage(projectiles[j]->damage);
+                    if(!enemies[i]->alive)
+                    {
+                        delete enemies[i];
+                        enemies.erase(enemies.begin() + i);
+                    }
                     delete projectiles[j];
                     projectiles.erase(projectiles.begin() + j);
                     break;
                 }
-
             }
         }
+        if(player->hp < 0)
+            gameWindow.close();
+
 
         //Drawing sprites
         gameWindow.clear();
