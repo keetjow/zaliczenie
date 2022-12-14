@@ -23,7 +23,7 @@ int main()
     std::vector<Enemy*> enemies;
     sf::Clock enemySpawnRate;
     srand(time(NULL));
-    float spawnRate = 3;
+    float spawnRate = 1;
 
     //Player setup
     sf::Vector2f mousePos;
@@ -49,7 +49,12 @@ int main()
         //Spawning enemies
         if(enemySpawnRate.getElapsedTime().asSeconds() > spawnRate)
         {
-            sf::Vector2f randomPosition(rand()%1921, rand()%1081);
+            sf::Vector2f randomPosition;
+            do
+            {
+                randomPosition = sf::Vector2f(rand()%1921, rand()%1081);
+            }
+            while(distanceBetween(randomPosition, player->body.getPosition()) < 450);
             int randomNumber = rand()%3;
             switch(randomNumber)
             {
@@ -103,7 +108,6 @@ int main()
         }
         if(player->hp < 0)
             gameWindow.close();
-
 
         //Drawing sprites
         gameWindow.clear();
