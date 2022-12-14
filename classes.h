@@ -83,4 +83,3 @@ class Slime : public Enemy
     public:
     Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
-
