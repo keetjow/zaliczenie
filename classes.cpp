@@ -49,6 +49,8 @@ void Player::update(float &dt)
     //Shooting
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         this->shoot();
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        this->useAbility();
 }
 
 void Player::shoot()
@@ -56,8 +58,22 @@ void Player::shoot()
     if(this->shootTimer.getElapsedTime().asMilliseconds() > this->fireRate)
     {
         sf::Vector2f velocity = this->mousePos - this->body.getPosition();
-        this->projectiles.push_back(new Projectile(this->window, this->body.getPosition(), velocity));
+        this->projectiles.push_back(new Projectile(this->window, this->body.getPosition(), velocity, this->attackPower));
         this->shootTimer.restart();
+    }
+}
+
+void Player::useAbility()
+{
+    if(this->abilityCooldown.getElapsedTime().asSeconds() > 5)
+    {
+        for(int i = 0; i < 16; i++)
+        {
+            float angle = i*M_PI/8;
+            sf::Vector2f velocity = sf::Vector2f(std::sin(angle), std::cos(angle)*(-1));
+            this->projectiles.push_back(new Projectile(this->window, this->body.getPosition(), velocity, this->attackPower*3));
+        }
+        abilityCooldown.restart();
     }
 }
 
@@ -73,10 +89,10 @@ BlueGhost::BlueGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
-    this->body.setScale(2, 2);
+    this->body.setScale(3, 3);
     this->body.setPosition(startPos);
     //Stats setup
-    this->movementSpeed = 300.f;
+    this->movementSpeed = 230.f;
     this->hp = 10.f;
     this->attackPower = 10.f;
 }
@@ -88,12 +104,12 @@ PurpleGhost::PurpleGhost(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vec
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
-    this->body.setScale(2, 2);
+    this->body.setScale(3, 3);
     this->body.setPosition(startPos);
     //Stats setup
     this->movementSpeed = 200.f;
     this->hp = 20.f;
-    this->attackPower = 15.f;
+    this->attackPower = 20.f;
 }
 
 Slime::Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos) : Enemy(windowRef, targetRef)
@@ -103,7 +119,7 @@ Slime::Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startP
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(0, 0, 16, 16));
     this->body.setOrigin(this->body.getPosition().x + 8, this->body.getPosition().y + 8);
-    this->body.setScale(2, 2);
+    this->body.setScale(3, 3);
     this->body.setPosition(startPos);
     //Stats setup
     this->movementSpeed = 150.f;
@@ -117,14 +133,37 @@ void Enemy::update(float &dt)
     this->velocity = this->target->body.getPosition() - this->body.getPosition();
     float dist = std::sqrt(std::pow(velocity.x, 2) + std::pow(velocity.y, 2));
     sf::Vector2f velocityN = this->velocity/dist;
-    this->body.move(velocityN * this->movementSpeed*dt);
+    if(dist > 10 && !this->knockbackState)
+        this->moveVector = velocityN * this->movementSpeed;
+
+    if(this->body.getGlobalBounds().intersects(this->target->body.getGlobalBounds()))
+    {
+        this->knockbackTimer.restart();
+        this->target->hp -= this->attackPower;
+        this->knockbackState = true;
+        this->moveVector = velocityN * (-1.f) * this->movementSpeed;
+    }
+    if(knockbackTimer.getElapsedTime().asMilliseconds() > 500)
+        this->knockbackState = false;
+
+    this->body.move(this->moveVector*dt);
 }
 
+//Enemy damage managment
+void Enemy::takeDamage(float damageReceiveAmount)
+{
+    this->hp -= damageReceiveAmount;
+    this->body.setScale(this->body.getScale().x -0.3f, this->body.getScale().y -0.3f);
+    this->movementSpeed -= 30;
+    if(this->hp < 0)
+        this->alive = false;
+}
 
 //Projectile constructor
-Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::Vector2f velocity)
+Projectile::Projectile(sf::RenderWindow &windowRef, sf::Vector2f startPos, sf::Vector2f velocity, float damageAmount)
     :window(windowRef)
 {
+    this->damage = damageAmount;
     this->texture.loadFromFile("media/projectiles.png");
     this->body.setTexture(this->texture);
     this->body.setTextureRect(sf::IntRect(16, 8, 8, 8));
