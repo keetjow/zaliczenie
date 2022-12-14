@@ -5,7 +5,7 @@
 class Projectile
 {
     public:
-        float speed = 1000;
+        float speed = 1300;
         float damage;
         sf::Texture texture;
         sf::Sprite body;
@@ -27,6 +27,7 @@ class Entity
 
     public:
         float hp;
+        float maxHp;
         float movementSpeed;
         float attackPower;
         sf::Sprite body;
@@ -34,6 +35,7 @@ class Entity
         virtual void update(float &dt) = 0;
         Entity(sf::RenderWindow &windowRefBase);
         bool alive = true;
+        friend void distanceBetween(Entity* a, Entity* b);
 };
 
 class Player : public Entity
@@ -83,3 +85,5 @@ class Slime : public Enemy
     public:
     Slime(sf::RenderWindow &windowRef, Entity* targetRef, sf::Vector2f startPos);
 };
+
+float distanceBetween(sf::Vector2f a, sf::Vector2f b);
